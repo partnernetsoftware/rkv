@@ -1,5 +1,5 @@
 //RKVPASS=???? && \
-//pm2 start rkv -i max -- /port=8880 /r="{\"password\":\"$RKVPASS\"}" --watch --ignore-watch="_logs *.db *.db*"
+//pm2 start rkv -i max -- /port=8880 /r="{\"password\":\"$RKVPASS\"}" --watch . --ignore-watch="_logs *.db *.db*"
 //node rkv /port=7890 /r="{\"password\":\"????\"}"
 //pm2 stop rkv
 //module.exports=function(Application)
@@ -11,7 +11,7 @@
 	var cpus = argo.cpus || require('os').cpus().length;
 	var cluster_mode = "solo";
 
-	var no_daemon = false;//@ref affect nodenodenode behavior, i.e. skip listening..
+	//var no_daemon = false;//@ref affect nodenodenode behavior, i.e. skip listening..
 	var pid = process.pid;//
 	var pm_id = process.env.pm_id;
 	var fk_id = process.env.fk_id;
@@ -58,12 +58,14 @@
 			}
 		}
 	}
-	if(flagMaster){
-		if(cpus>1){
-			no_daemon=true;
-		}
-	}
-	ProcPool[pid]={pid,pm_id,fk_id,flagMaster,no_daemon,flagPm2};
+	//if(flagMaster){
+	//	if(cpus>1){
+	//		no_daemon=true;
+	//	}
+	//}
+	ProcPool[pid]={pid,pm_id,fk_id,flagMaster,
+		//no_daemon,
+		flagPm2};
 	logger.log(`NOTICE: start cpus=${cpus}, cluster_mode=${cluster_mode}`,ProcPool,WorkerPool);
 
 	///////////////////////////////////////
@@ -86,7 +88,9 @@
 					var server = await conn.server();
 					var cursor = await r.db('rethinkdb').table('server_status').run(conn);
 					var result = await cursor.toArray();
-					var rt = {server_count: result.length, server};
+					var rt = {
+						pid,pm_id,fk_id,flagMaster,flagPm2,cluster_mode,
+						server_count: result.length, server};
 					var rta = [];
 					loop(result,(k,v)=>{
 						rta.push({
