@@ -1,4 +1,4 @@
-//e.g. node test_rdb /password=
+//e.g. node test_rdb /password=???
 //(async()=>{
 		var argv2o = a => (a || require('process').argv || []).reduce((r, e) => ((m = e.match(/^(\/|--?)([\w-]*)="?(.*)"?$/)) && (r[m[2]] = m[3]), r), {}), argo = argv2o();
 	var r = require('rethinkdb');
@@ -15,7 +15,7 @@
 			//@ref https://rethinkdb.com/api/javascript/
 			//r.db('rethinkdb').table('server_status').run(conn,(err,cursor)=>cursor.toArray(console.log))
 			var cursor = await r.db('rethinkdb').table('server_status').run(conn);
-			console.log(await cursor.toArray());
+			console.log(JSON.stringify(await cursor.toArray()));
 		}
 	});
 //})();
