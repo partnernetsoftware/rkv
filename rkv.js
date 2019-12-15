@@ -1,6 +1,7 @@
 //pm2 stop rkv
 //RKVPASS=???? && \
-//pm2 start rkv.js -f -i max -- /port=8880 /r="{\"password\":\"$RKVPASS\"}" --watch . --ignore-watch="_logs *.db *.db*"
+//pm2 start rkv.js -i max -- /port=8880 /r="{\"password\":\"$RKVPASS\"}" --watch . --ignore-watch="_logs rdbdata *.db *.db*"
+//pm2 restart rtv
 //node rkv /port=7890 /r="{\"password\":\"????\"}"
 //pm2 stop rkv
 //module.exports=function(Application)
@@ -92,7 +93,8 @@
 					var cursor = await r.db('rethinkdb').table('server_status').run(conn);
 					var result = await cursor.toArray();
 					var rt = {
-						pid,pm_id,fk_id,flagMaster,
+						pid,pm_id,fk_id,
+						//flagMaster,
 						//flagPm2,
 						cluster_mode,
 						start_time,
