@@ -1,10 +1,12 @@
+//pm2 stop rkv
 //RKVPASS=???? && \
-//pm2 start rkv -i max -- /port=8880 /r="{\"password\":\"$RKVPASS\"}" --watch . --ignore-watch="_logs *.db *.db*"
+//pm2 start rkv.js -f -i max -- /port=8880 /r="{\"password\":\"$RKVPASS\"}" --watch . --ignore-watch="_logs *.db *.db*"
 //node rkv /port=7890 /r="{\"password\":\"????\"}"
 //pm2 stop rkv
 //module.exports=function(Application)
 (async({argo={},logger=console}={})=>{
 
+	var start_time = new Date();
 	var process = require('process');
 	var {pid,env} = process;
 	var {pm_id,fk_id} = env||{};
@@ -90,6 +92,7 @@
 					var result = await cursor.toArray();
 					var rt = {
 						pid,pm_id,fk_id,flagMaster,flagPm2,cluster_mode,
+						start_time,
 						server_count: result.length, server};
 					var rta = [];
 					loop(result,(k,v)=>{
