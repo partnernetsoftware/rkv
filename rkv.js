@@ -1,5 +1,7 @@
-//pm2 start rkv.js -i max -- /port=7890 /r="{\"password\":\"????\"}"
+//RKVPASS=???? && \
+//pm2 start rkv -i max -- /port=8880 /r="{\"password\":\"$RKVPASS\"}" --watch --ignore-watch="_logs *.db *.db*"
 //node rkv /port=7890 /r="{\"password\":\"????\"}"
+//pm2 stop rkv
 //module.exports=function(Application)
 (async({argo={},logger=console}={})=>{
 
@@ -81,12 +83,14 @@
 					if(!conn){
 						conn = await r.connect( s2o(argo.r||'null') );
 					}
+					var server = await conn.server();
 					var cursor = await r.db('rethinkdb').table('server_status').run(conn);
 					var result = await cursor.toArray();
-					var rt = {server_count: result.length};
+					var rt = {server_count: result.length, server};
 					var rta = [];
 					loop(result,(k,v)=>{
 						rta.push({
+							id:v.id,
 							time_started: v.process.time_started,
 							time_started_diff:  new Date() - Date.parse(v.process.time_started),
 							//canonical_addresses: v.network.canonical_addresses,
