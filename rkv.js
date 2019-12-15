@@ -29,7 +29,7 @@
 		pm2 = require('pm2');
 		if(cpus>1){
 			cluster_mode = "pm2"
-			if( pm_id > 0 ) flagMaster=false;
+			if( pm_id > 0 ) flagMaster=false;//pm2 mode using first as master...
 		}
 	}else{
 		if(cpus>1){
@@ -65,7 +65,8 @@
 	//		no_daemon=true;
 	//	}
 	//}
-	ProcPool[pid]={pid,pm_id,fk_id,flagMaster,
+	ProcPool[pid]={pid,pm_id,fk_id,
+		flagMaster,
 		//no_daemon,
 		flagPm2};
 	logger.log(`NOTICE: start cpus=${cpus}, cluster_mode=${cluster_mode}`,ProcPool,WorkerPool);
@@ -91,7 +92,9 @@
 					var cursor = await r.db('rethinkdb').table('server_status').run(conn);
 					var result = await cursor.toArray();
 					var rt = {
-						pid,pm_id,fk_id,flagMaster,flagPm2,cluster_mode,
+						pid,pm_id,fk_id,flagMaster,
+						//flagPm2,
+						cluster_mode,
 						start_time,
 						server_count: result.length, server};
 					var rta = [];
