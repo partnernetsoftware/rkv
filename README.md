@@ -8,7 +8,7 @@ global distributed kv with [rethinkdb](https://rethinkdb.com/), in one line comm
 # docker mode
 
 RKVPASS=egrkvpass \
-CANONICAL=egrkv.partnernetsoftware.com \
+CANONICAL=`curl http://checkip.amazonaws.com` \
 RKVCLUSTER=egrkv.partnernetsoftware.com \
 sh docker_rkv_work.sh \
 sh rkv_work.sh
@@ -16,7 +16,7 @@ sh rkv_work.sh
 # native mode
 
 RKVPASS=egrkvpass \
-CANONICAL=egrkv.partnernetsoftware.com \
+CANONICAL=`curl http://checkip.amazonaws.com` \
 RKVCLUSTER=egrkv.partnernetsoftware.com \
 sh rkv_work.sh
 
