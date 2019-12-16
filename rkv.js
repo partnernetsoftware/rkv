@@ -80,44 +80,47 @@
 	var r = require('rethinkdb');
 	var conn;
 	console.log('connected rethinkdb')
-	if(cpus==1 || !flagMaster)
-		require('http').createServer()
-			.on('error',console.log)
-			.on('request',async(req,resp)=>{
-				console.log('req',req.url)
-				try{
-					if(!conn){
-						conn = await r.connect( s2o(argo.r||'null') );
-					}
-					var server = await conn.server();
-					var cursor = await r.db('rethinkdb').table('server_status').run(conn);
-					var result = await cursor.toArray();
-					var rt = {
-						pid,pm_id,fk_id,
-						//flagMaster,
-						//flagPm2,
-						cluster_mode,
-						start_time,
-						server_count: result.length, server};
-					var rta = [];
-					loop(result,(k,v)=>{
-						rta.push({
-							id:v.id,
-							time_started: v.process.time_started,
-							time_started_diff:  new Date() - Date.parse(v.process.time_started),
-							//canonical_addresses: v.network.canonical_addresses,
-							time_connected: v.network.time_connected,
-							time_connected_diff: new Date() - Date.parse(v.network.time_connected),
-						})
-					});
-					rt.a = rta;
-					console.log(result);
-					resp.end(o2s(rt))
-				}catch(ex){
-					if(ex && ex.name == 'ReqlDriverError') conn = null;
-					resp.end(o2s(ex))
+	if(cpus==1 || !flagMaster){
+		var server = (process.env.HTTPS_KEY) ? {
+			require('https').createServer({key: process.env.HTTPS_KEY,cert: process.env.HTTPS_CERT})
+		}else{
+			require('http').createServer()
+		}
+		server.on('error',console.log).on('request',async(req,resp)=>{
+			console.log('req',req.url)
+			try{
+				if(!conn){
+					conn = await r.connect( s2o(argo.r||'null') );
 				}
-			})
-			.listen({port:argo.port,host:argo.host||'0.0.0.0'})
+				var server = await conn.server();
+				var cursor = await r.db('rethinkdb').table('server_status').run(conn);
+				var result = await cursor.toArray();
+				var rt = {
+					pid,pm_id,fk_id,
+					//flagMaster,
+					//flagPm2,
+					cluster_mode,
+					start_time,
+					server_count: result.length, server};
+				var rta = [];
+				loop(result,(k,v)=>{
+					rta.push({
+						id:v.id,
+						time_started: v.process.time_started,
+						time_started_diff:  new Date() - Date.parse(v.process.time_started),
+						//canonical_addresses: v.network.canonical_addresses,
+						time_connected: v.network.time_connected,
+						time_connected_diff: new Date() - Date.parse(v.network.time_connected),
+					})
+				});
+				rt.a = rta;
+				console.log(result);
+				resp.end(o2s(rt))
+			}catch(ex){
+				if(ex && ex.name == 'ReqlDriverError') conn = null;
+				resp.end(o2s(ex))
+			}
+		}).listen({port:argo.port,host:argo.host||'0.0.0.0'})
+	}
 
 })({argo:(a=>(a||require('process').argv||[]).reduce((r,e)=>((m=e.match(/^(\/|--?)([\w-]*)="?(.*)"?$/))&&(r[m[2]]=m[3]),r),{}))()});
