@@ -1,4 +1,5 @@
 //module.exports=function(Application)
+const fs = require('fs');
 (async({argo={},logger=console}={})=>{
 
 	var start_time = new Date();
@@ -81,7 +82,7 @@
 	});
 	if(cpus==1 || !flagMaster){
 		((argo.HTTPS_KEY) ? 
-			require('https').createServer({key: argo.HTTPS_KEY,cert: argo.HTTPS_CERT})
+			require('https').createServer({key: fs.readFileSync(argo.HTTPS_KEY),cert: fs.readFileSync(argo.HTTPS_CERT)})
 			: require('http').createServer()
 		).on('error',console.log).on('request', rkv_handler).listen({port:argo.port,host:argo.host||'0.0.0.0'})
 	}
