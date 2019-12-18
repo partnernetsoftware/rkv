@@ -80,8 +80,8 @@
 		argo_rdb,
 	});
 	if(cpus==1 || !flagMaster){
-		((process.env.HTTPS_KEY) ? 
-			require('https').createServer({key: process.env.HTTPS_KEY,cert: process.env.HTTPS_CERT})
+		((argo.HTTPS_KEY) ? 
+			require('https').createServer({key: argo.HTTPS_KEY,cert: argo.HTTPS_CERT})
 			: require('http').createServer()
 		).on('error',console.log).on('request', rkv_handler).listen({port:argo.port,host:argo.host||'0.0.0.0'})
 	}
