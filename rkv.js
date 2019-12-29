@@ -9,16 +9,13 @@ const fs = require('fs');
 	var cpus = argo.cpus || require('os').cpus().length;
 	var cluster_mode = "solo";
 
-	//var no_daemon = false;//@ref affect nodenodenode behavior, i.e. skip listening..
 	var pid = process.pid;//
 	var pm_id = process.env.pm_id;
 	var fk_id = process.env.fk_id;
-	var flagMaster = true;
+	var flagMaster = true;//master might need to do more singleton job when cpus>1
 	var flagPm2 = false;
-
 	var ProcPool={};
 	var WorkerPool={};
-
 	var pm2;
 	if (pm_id>=0) {
 		flagPm2 = true;
@@ -32,6 +29,11 @@ const fs = require('fs');
 			cluster_mode = "cluster"
 			var cluster = require('cluster');
 			if (cluster.isMaster) {
+				//cluster.on('exit', (worker, code, signal)=>{
+				//	console.log('worker %d died (%s). restarting...', worker.process.pid, signal || code);
+				//	cluster.fork();
+				//	console.log('[REFORK] Server running at http://127.0.0.1:8000/');
+				//});
 				var forkWorker = (fk_id) => {
 					//NOTES: fk_id for debug only
 					const worker = cluster.fork({fk_id});
@@ -50,32 +52,26 @@ const fs = require('fs');
 							else { logger.log(`worker${fk_id} exit success ${code},${signal}`); }
 						});
 				};
-				for (var i = 1; i < cpus; i++) forkWorker(i);//NOTES: only spawn cpus-1
+				//for (var i = 1; i < cpus; i++)
+				for(let j=cpus;j--;)
+					forkWorker(i);
 			}else{
 				flagMaster=false;
 			}
 		}
 	}
-	//if(flagMaster){
-	//	if(cpus>1){
-	//		no_daemon=true;
-	//	}
-	//}
-	ProcPool[pid]={pid,pm_id,fk_id,
-		flagMaster,
-		//no_daemon,
-		flagPm2};
+	ProcPool[pid]={pid,pm_id,fk_id,flagMaster,flagPm2};
 	logger.log(`NOTICE: start cpus=${cpus}, cluster_mode=${cluster_mode}`,ProcPool,WorkerPool);
 
 	///////////////////////////////////////
 	console.log({argo})
 	var argo_rdb = JSON.parse(argo.r||'null');//TODO get from stdin also
 	//const o2o = (o1,o2)=>{for(var k in o2){o1[k]=o2[k]}return o1};
+	//TODO manually reload the handler again when updated...
 	var conn;//
 	var rkv_handler = require('./rkv_handler')({argo,conn,
 		pid,pm_id,fk_id,
-		flagMaster,cpus,
-		//flagPm2,
+		flagMaster,cpus, flagPm2,
 		cluster_mode,
 		start_time,
 		argo_rdb,

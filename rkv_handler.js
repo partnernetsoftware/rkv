@@ -2,7 +2,7 @@ var o2s = JSON.stringify;
 var s2o = JSON.parse;
 var rdb = require('rethinkdb');
 
-//happy-advance-js-ing:
+//shorthand on Promise
 var	P=async(f)=>('function'==typeof f)?new Promise(f):f;
 P.delay = (t) => P(resolve=>setTimeout(resolve,t>0?t:1));
 P.all = (a=[]) => Promise.all(a);
@@ -77,6 +77,7 @@ module.exports = (init_opts={}) => async(req,resp)=>{
 							.run(conn);
 						console.log({rst_replace});
 					}
+					//TODO ensure after fail getting
 					var rst_get = await rdb.db(dbn).table(tbl).get(appkey).run(conn);
 					result = rst_get || {};
 					result.now=new Date();
