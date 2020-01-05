@@ -41,20 +41,20 @@ const fs = require('fs');
 						logger.log(`worker${fk_id} disconnect, will auto launch again...`);
 						forkWorker(fk_id);
 					}).on('message',msgInfo=>process_on_message(msgInfo,4))
-						.on('listening', (address) => logger.log(`worker${fk_id} was is listening: `,address))
+						.on('listening', (address) => logger.log(`worker${fk_id} is listening: `,address))
 						.on('online',()=>{
-							logger.log(`NOTICE worker${fk_id} was online`,);
+							logger.log(`NOTICE worker${fk_id} is online`,);
 							WorkerPool[worker.process.pid]=worker;//store
 						}).on('exit', (code, signal) => {
 							delete WorkerPool[worker.process.pid];
-							if (signal) { logger.log(`worker${fk_id} was killed by signal: ${signal}`); }
+							if (signal) { logger.log(`worker${fk_id} is killed by signal: ${signal}`); }
 							else if (code !== 0) { logger.log(`worker${fk_id} exited with error code: ${code}`); }
 							else { logger.log(`worker${fk_id} exit success ${code},${signal}`); }
 						});
 				};
 				//for (var i = 1; i < cpus; i++)
 				for(let j=cpus;j--;)
-					forkWorker(i);
+					forkWorker(j);
 			}else{
 				flagMaster=false;
 			}
