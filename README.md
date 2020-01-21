@@ -19,7 +19,8 @@ pm2 stop rkv
 
 ```
 
-# NOTES
+# IMPORTANT NOTES
 
-if you wanna run it in private network, zerotier might be your great choice.
+* if you wanna run it in private network, zerotier might be your great choice.
+* don't directly upgrade the server rethinkdb version with the older version repository folder !!!! always export and backup data before taking actions on upgrading....
 
