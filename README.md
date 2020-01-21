@@ -24,3 +24,19 @@ pm2 stop rkv
 * if you wanna run it in private network, zerotier might be your great choice.
 * don't directly upgrade the server rethinkdb version with the older version repository folder !!!! always export and backup data before taking actions on upgrading....
 
+# quick test
+
+```
+var rdb = require('rethinkdb');
+
+var conn;
+
+(async()=>{
+        console.log(111);
+        if(!conn) conn = await rdb.connect({host,password,timeout});
+        console.log(112);
+        var rst = await rdb.dbList().run(conn);
+        console.log(113);
+        console.log({rst});
+})();
+```
